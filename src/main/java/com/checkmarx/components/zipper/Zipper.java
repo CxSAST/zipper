@@ -37,6 +37,10 @@ public class Zipper {
     {
         DirectoryScanner ds = new DirectoryScanner();
         ds.setBasedir(baseDir);
+        ds.setCaseSensitive(false);
+        ds.setFollowSymlinks(false);
+        ds.setErrorOnMissingDir(false);
+
 
         LinkedList<String> includePatterns = new LinkedList<String>();
         LinkedList<String> excludePatterns = new LinkedList<String>();
@@ -53,14 +57,22 @@ public class Zipper {
                 {
                     pattern = pattern.substring(1); // Trim the "!"
                     excludePatterns.add(pattern);
+                    logger.debug("Exclude pattern detected: >" + pattern + "<");
                 } else {
                     includePatterns.add(pattern);
+                    logger.debug("Include pattern detected: >" + pattern + "<");
                 }
             }
         }
 
-        ds.setIncludes(includePatterns.toArray(new String[]{}));
-        ds.setExcludes(excludePatterns.toArray(new String[]{}));
+        if (includePatterns.size()>0)
+        {
+            ds.setIncludes(includePatterns.toArray(new String[]{}));
+        }
+        if (excludePatterns.size()>0)
+        {
+            ds.setExcludes(excludePatterns.toArray(new String[]{}));
+        }
         return ds;
     }
 
@@ -87,6 +99,11 @@ public class Zipper {
         for(String file : ds.getExcludedDirectories())
         {
             logger.debug("Excluded Dir: " + file);
+        }
+
+        for(String file : ds.getNotFollowedSymlinks())
+        {
+            logger.debug("Not followed symbolic link: " + file);
         }
      }
 }

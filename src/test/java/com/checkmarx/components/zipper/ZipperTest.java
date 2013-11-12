@@ -14,6 +14,8 @@ import java.io.File;
  * Description:
  */
 public class ZipperTest extends TestCase {
+
+
     /**
      * Create the test case
      *
@@ -30,13 +32,21 @@ public class ZipperTest extends TestCase {
         return new TestSuite(ZipperTest.class);
     }
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testPattern() {
+    public void testPattern1() {
+
 
         Zipper zipper = new Zipper();
-        String filters = "**";
+        String filters = "**, !**/f1.*\n!**/f2.*, !* *   ,/pr,pr/, ! .DS_Store,  !.DS_Store, !! .DS_Store,,,   ,\" \" ";
+        byte[] zip = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters);
+
+        assertTrue(true);
+    }
+
+    public void testPattern2() {
+
+
+        Zipper zipper = new Zipper();
+        String filters = "!**/*.txt";
         byte[] zip = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters);
 
         assertTrue(true);
