@@ -76,7 +76,7 @@ public class ZipperTest extends TestCase {
 
         assertTrue(true);
     }
-    public void testZip1() {
+    public void OfftestZip1() {
 
 
         Zipper zipper = new Zipper();
@@ -86,15 +86,36 @@ public class ZipperTest extends TestCase {
             public void updateProgress(String currentFileName, long currentCompressedSize) {
                 System.out.println("ZipListener.updateProgress: " + currentFileName + " size: " + currentCompressedSize);
             }
-
-            public void sizeLimitReached(long currentCompressedSize, long maxZipSize) {
-                System.out.println("ZipListener.sizeLimitReached: " + currentCompressedSize + " max: " + maxZipSize);
-            }
         };
 
         try {
             FileOutputStream out = new FileOutputStream("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/zipper/target/work/testOutput.zip");
             zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters,out,100000,zipListener);
+            out.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        assertTrue(true);
+    }
+
+    public void testErrors1() {
+
+
+        Zipper zipper = new Zipper();
+        String filters = "!f1.txt";
+
+        ZipListener zipListener = new ZipListener() {
+            public void updateProgress(String currentFileName, long currentCompressedSize) {
+                System.out.println("ZipListener.updateProgress: " + currentFileName + " size: " + currentCompressedSize);
+            }
+        };
+
+        try {
+            FileOutputStream out = new FileOutputStream("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/zipper/target/work/testOutput.zip");
+            zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters,out,0,zipListener);
             out.close();
 
         } catch (IOException e) {

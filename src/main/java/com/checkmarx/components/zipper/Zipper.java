@@ -122,14 +122,25 @@ public class Zipper {
      * @param listener A listener that is notified of the compression progress. Notification is sent
      *                 each time a new file begins compression.
      * @throws Zipper.MaxZipSizeReached If maxZipSize limit is reached
+     * @throws NoFilesToZip If there are no files to zip. Either the base directory is empty or does not exists, or all
+     *                      the files are filtered out by the filter.
      * @throws IOException
      */
 
     public void zip(File baseDir, String filterPatterns, OutputStream outputStream, long maxZipSize, ZipListener listener) throws IOException
     {
+        assert baseDir!=null : "baseDir must not be null";
+        assert outputStream !=null : "outputStream must not be null";
+
         DirectoryScanner ds = createDirectoryScanner(baseDir,filterPatterns);
         ds.scan();
         printDebug(ds);
+        if (ds.getIncludedFiles().length == 0)
+        {
+            outputStream.close();
+            logger.info("No files to zip");
+            throw new NoFilesToZip();
+        }
         zipFile(baseDir,ds.getIncludedFiles(),outputStream,maxZipSize,listener);
         return;
     }
@@ -148,10 +159,12 @@ public class Zipper {
      * @param listener A listener that is notified of the compression progress. Notification is sent
      *                 each time a new file begins compression.
      * @throws Zipper.MaxZipSizeReached If maxZipSize limit is reached
+     * @throws NoFilesToZip If there are no files to zip. Either the base directory is empty or does not exists, or all
+     *                      the files are filtered out by the filter.
      * @throws IOException
      */
 
-    public byte[] zip(File baseDir, String filterPatterns, long maxZipSize,ZipListener listener) throws IOException {
+    public byte[] zip(File baseDir, String filterPatterns, long maxZipSize, ZipListener listener) throws IOException {
         ByteOutputStream byteOutputStream = new ByteOutputStream();
         zip(baseDir,filterPatterns,byteOutputStream,maxZipSize,listener);
         return byteOutputStream.getBytes();
@@ -207,7 +220,14 @@ public class Zipper {
 
 
         // Parse filter patterns
-        String[] patterns = StringUtils.split(filterPatterns,",\n");
+        String[] patterns;
+        if (filterPatterns!=null)
+        {
+            patterns = StringUtils.split(filterPatterns,",\n");
+        } else {
+            patterns = new String[]{};
+        }
+
         for(String pattern : patterns)
         {
             pattern = pattern.trim();
@@ -286,6 +306,18 @@ public class Zipper {
 
         public long getMaxZipSize() {
             return maxZipSize;
+        }
+    }
+
+    /**
+     * Thrown when there are no files to zip. Either the base directory is empty or does not exists, or all
+     * the files are filtered out by the filter.
+     */
+    public static class NoFilesToZip extends IOException
+    {
+        public NoFilesToZip()
+        {
+            super("No files to zip");
         }
     }
 }
