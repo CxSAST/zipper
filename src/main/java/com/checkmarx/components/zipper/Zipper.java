@@ -197,8 +197,8 @@ public class Zipper {
             zipOutputStream.putNextEntry(zipEntry);
             FileInputStream fileInputStream = new FileInputStream(file);
             IOUtils.copy(fileInputStream, zipOutputStream);
-            zipOutputStream.closeEntry();
             fileInputStream.close();
+            zipOutputStream.closeEntry();
             compressedSize+=zipEntry.getCompressedSize();
         }
 

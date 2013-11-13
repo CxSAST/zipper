@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="976e294a-f080-44fc-b8f3-208ec9635ca2" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/checkmarx/components/zipper/Zipper.java" afterPath="$PROJECT_DIR$/src/main/java/com/checkmarx/components/zipper/Zipper.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/com/checkmarx/components/zipper/ZipperTest.java" afterPath="$PROJECT_DIR$/src/test/java/com/checkmarx/components/zipper/ZipperTest.java" />
     </list>
     <ignored path="zipper.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -223,7 +222,7 @@
       <file leaf-file-name="Zipper.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/checkmarx/components/zipper/Zipper.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="140" column="33" selection-start="6144" selection-end="6144" vertical-scroll-proportion="-0.4084249">
+            <state line="199" column="36" selection-start="9122" selection-end="9122" vertical-scroll-proportion="-2.1593406">
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#9630#9638#0" expanded="true" />
@@ -740,7 +739,7 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.76816607" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2497332" sideWeight="0.66205305" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33794695" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33794695" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Aspects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -945,9 +944,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/commons-io/commons-io/2.4/commons-io-2.4.jar!/org/apache/commons/io/IOUtils.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="187" column="97" selection-start="10941" selection-end="10943" vertical-scroll-proportion="0.3484252">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/checkmarx/components/zipper/Zipper.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="140" column="33" selection-start="6144" selection-end="6144" vertical-scroll-proportion="-0.4084249">
+        <state line="199" column="36" selection-start="9122" selection-end="9122" vertical-scroll-proportion="-2.1593406">
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#9630#9638#0" expanded="true" />
