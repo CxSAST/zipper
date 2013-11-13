@@ -34,13 +34,13 @@ public class ZipperTest extends TestCase {
         return new TestSuite(ZipperTest.class);
     }
 
-    public void testPattern1() {
+    public void OfftestPattern1() {
 
 
         Zipper zipper = new Zipper();
         String filters = "**, !**/f1.*\n!**/f2.*, !* *   ,/pr,pr/, ! .DS_Store,  !.DS_Store, !! .DS_Store,,,   ,\" \" ";
         try {
-            byte[] zip = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters,0);
+            byte[] zip = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters,0,null);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -48,13 +48,13 @@ public class ZipperTest extends TestCase {
         assertTrue(true);
     }
 
-    public void testPattern2() {
+    public void OfftestPattern2() {
 
 
         Zipper zipper = new Zipper();
-        String filters = "!**/*.txt";
+        String filters = "!***/*//*.txt";
         try {
-            byte[] zip = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters,0);
+            byte[] zip = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters,0,null);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -63,13 +63,13 @@ public class ZipperTest extends TestCase {
     }
 
 
-    public void testPattern3() {
+    public void OfftestPattern3() {
 
 
         Zipper zipper = new Zipper();
-        String filters = "a/*.txt";
+        String filters = "a*//*.txt";
         try {
-            byte[] zip = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters,0);
+            byte[] zip = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters,0,null);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -81,12 +81,20 @@ public class ZipperTest extends TestCase {
 
         Zipper zipper = new Zipper();
         String filters = "!f1.txt";
-        try {
-            byte[] zip = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters,0);
-            FileOutputStream out = new FileOutputStream("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/zipper/target/work/testOutput.zip");
-            //System.out.println("Output file: " + out.getFD().);
 
-            out.write(zip);
+        ZipListener zipListener = new ZipListener() {
+            public void updateProgress(String currentFileName, long currentCompressedSize) {
+                System.out.println("ZipListener.updateProgress: " + currentFileName + " size: " + currentCompressedSize);
+            }
+
+            public void sizeLimitReached(long currentCompressedSize, long maxZipSize) {
+                System.out.println("ZipListener.sizeLimitReached: " + currentCompressedSize + " max: " + maxZipSize);
+            }
+        };
+
+        try {
+            FileOutputStream out = new FileOutputStream("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/zipper/target/work/testOutput.zip");
+            zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters,out,100000,zipListener);
             out.close();
 
         } catch (IOException e) {

@@ -121,15 +121,14 @@ public class Zipper {
      * @throws IOException
      */
 
-    // TODO: add listener delegate
-    public void zip(File baseDir, String filterPatterns, OutputStream outputStream, long maxZipSize) throws IOException
+    public void zip(File baseDir, String filterPatterns, OutputStream outputStream, long maxZipSize, ZipListener listener) throws IOException
     {
         DirectoryScanner ds = createDirectoryScanner(baseDir,filterPatterns);
         ds.scan();
         printDebug(ds);
 
 
-        zipFile(baseDir,ds.getIncludedFiles(),outputStream,maxZipSize);
+        zipFile(baseDir,ds.getIncludedFiles(),outputStream,maxZipSize,listener);
 
 
         return;
@@ -149,32 +148,45 @@ public class Zipper {
      * @throws IOException
      */
 
-    public byte[] zip(File baseDir, String filterPatterns, long maxZipSize) throws IOException {
+    public byte[] zip(File baseDir, String filterPatterns, long maxZipSize,ZipListener listener) throws IOException {
         ByteOutputStream byteOutputStream = new ByteOutputStream();
-        zip(baseDir,filterPatterns,byteOutputStream,maxZipSize);
+        zip(baseDir,filterPatterns,byteOutputStream,maxZipSize,listener);
         return byteOutputStream.getBytes();
     }
 
-    private void zipFile(File baseDir, String[] files, OutputStream outputStream, long maxZipSize) throws IOException {
+    private void zipFile(File baseDir, String[] files, OutputStream outputStream, long maxZipSize,ZipListener listener) throws IOException {
         ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
         long compressedSize = 0;
-        for(String file : files)
+        final double AVERAGE_ZIP_COMPRESSION_RATIO = 4.0;
+
+        for(String fileName : files)
         {
-            logger.debug("Adding file to zip: " + file);
-            ZipEntry zipEntry = new ZipEntry(file);
+            logger.debug("Adding file to zip: " + fileName);
+
+            File file = new File(baseDir,fileName);
+
+            if (maxZipSize > 0 && compressedSize + (file.length()/AVERAGE_ZIP_COMPRESSION_RATIO) > maxZipSize)
+            {
+                logger.warn("Maximum zip file size reached. Zip size:" + compressedSize + " Limit:" + maxZipSize);
+                if (listener!=null)
+                {
+                    listener.sizeLimitReached(compressedSize,maxZipSize);
+                }
+                break;
+            }
+
+            if (listener!=null)
+            {
+                listener.updateProgress(fileName,compressedSize);
+            }
+
+            ZipEntry zipEntry = new ZipEntry(fileName);
             zipOutputStream.putNextEntry(zipEntry);
-            FileInputStream fileInputStream = new FileInputStream(new File(baseDir,file));
+            FileInputStream fileInputStream = new FileInputStream(file);
             IOUtils.copy(fileInputStream, zipOutputStream);
             zipOutputStream.closeEntry();
             fileInputStream.close();
             compressedSize+=zipEntry.getCompressedSize();
-            if (maxZipSize>0 && compressedSize > maxZipSize)
-            {
-                logger.warn("Maximum zip file size reached. Zip size:" + compressedSize + " Limit:" + maxZipSize);
-
-                // TODO: Notify caller about reached size limit
-                break;
-            }
         }
 
         zipOutputStream.close();
