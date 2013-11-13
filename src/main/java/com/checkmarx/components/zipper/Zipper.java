@@ -1,11 +1,13 @@
 package com.checkmarx.components.zipper;
 
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.DirectoryScanner;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedList;
@@ -13,18 +15,15 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Denis Krivitski
- * Date: 12/11/2013
- * Time: 15:10
- * Description:
- *  This class implements a file zipper with filter. Zipper will traverse a specified base directory
- *  and archive all files passing the specified filter test. The filter string is a comma separated list
- *  of include and exclude patterns.
- *
+ * File zipper with filter.
+ * <p>
+ * This class implements a file zipper with filter. Zipper will traverse a specified base directory
+ * and archive all files passing the specified filter test. The filter string is a comma separated list
+ * of include and exclude patterns.
+ * <p>
  *
  * Pattern Syntax: (taken from DirectoryScanner documentation)
- *
+ * <p>
  * A given directory is recursively scanned for all files
  * and directories. Each file/directory is matched against a set of selectors,
  * including special support for matching against filenames with include and
@@ -98,44 +97,84 @@ import java.util.zip.ZipOutputStream;
  * This will scan a directory called test for .class files, but excludes all
  * files in all proper subdirectories of a directory called "modules"
  *
+ *  @author  Denis Krivitski
+ *  <p>
+ *  Date: 12/11/2013
  */
 public class Zipper {
 
     private static final Logger logger = Logger.getLogger(Zipper.class);
 
-    // TODO: add zip size limitation parameter
-    public void zip(File baseDir, String filterPatterns, OutputStream outputStream) throws IOException
+
+    /**
+     * Scans the base directory, filters the files, and writes the compressed file content to
+     * the provided output stream.
+     *
+     * @param baseDir Contents of this directory will he filtered and zipped
+     * @param filterPatterns Filter wildcard patterns
+     * @param outputStream Compressed file content is written to this stream
+     * @param maxZipSize Limits the number of bytes that will be written to the output stream.
+     *                   Zero value means no limit.
+     *                   NOTE: This limit is checked on file boundaries. Once the limit is reached
+     *                   no more files will be written to the output stream. Therefore, the maxZipSize limit
+     *                   may be beached by the compressed size of the last file.
+     * @throws IOException
+     */
+
+    // TODO: add listener delegate
+    public void zip(File baseDir, String filterPatterns, OutputStream outputStream, long maxZipSize) throws IOException
     {
         DirectoryScanner ds = createDirectoryScanner(baseDir,filterPatterns);
         ds.scan();
         printDebug(ds);
 
 
-        zipFile(ds.getIncludedFiles(),outputStream);
+        zipFile(baseDir,ds.getIncludedFiles(),outputStream,maxZipSize);
 
 
         return;
     }
 
-    /*
-        Convenience method for receiving the zip archive in byte array
+    /**
+     * Scans the base directory, filters the files, and returns the compressed contents as a byte array.
+     *
+     * @param baseDir Contents of this directory will he filtered and zipped
+     * @param filterPatterns Filter wildcard patterns
+     * @param maxZipSize Limits the number of bytes that will be written to the output stream.
+     *                   Zero value means no limit.
+     *                   NOTE: This limit is checked on file boundaries. Once the limit is reached
+     *                   no more files will be written to the output stream. Therefore, the maxZipSize limit
+     *                   may be beached by the compressed size of the last file.
+     * @return Byte array with compressed contents of the filtered base directory.
+     * @throws IOException
      */
 
-    public byte[] zip(File baseDir, String filterPatterns) throws IOException {
+    public byte[] zip(File baseDir, String filterPatterns, long maxZipSize) throws IOException {
         ByteOutputStream byteOutputStream = new ByteOutputStream();
-        zip(baseDir,filterPatterns,byteOutputStream);
+        zip(baseDir,filterPatterns,byteOutputStream,maxZipSize);
         return byteOutputStream.getBytes();
     }
 
-    private void zipFile(String[] files, OutputStream outputStream) throws IOException {
+    private void zipFile(File baseDir, String[] files, OutputStream outputStream, long maxZipSize) throws IOException {
         ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
+        long compressedSize = 0;
         for(String file : files)
         {
             logger.debug("Adding file to zip: " + file);
             ZipEntry zipEntry = new ZipEntry(file);
             zipOutputStream.putNextEntry(zipEntry);
-            zipOutputStream.write(new byte[]{1,2,3});
+            FileInputStream fileInputStream = new FileInputStream(new File(baseDir,file));
+            IOUtils.copy(fileInputStream, zipOutputStream);
             zipOutputStream.closeEntry();
+            fileInputStream.close();
+            compressedSize+=zipEntry.getCompressedSize();
+            if (maxZipSize>0 && compressedSize > maxZipSize)
+            {
+                logger.warn("Maximum zip file size reached. Zip size:" + compressedSize + " Limit:" + maxZipSize);
+
+                // TODO: Notify caller about reached size limit
+                break;
+            }
         }
 
         zipOutputStream.close();

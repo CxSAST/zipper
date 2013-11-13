@@ -40,7 +40,7 @@ public class ZipperTest extends TestCase {
         Zipper zipper = new Zipper();
         String filters = "**, !**/f1.*\n!**/f2.*, !* *   ,/pr,pr/, ! .DS_Store,  !.DS_Store, !! .DS_Store,,,   ,\" \" ";
         try {
-            byte[] zip = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters);
+            byte[] zip = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters,0);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -54,7 +54,7 @@ public class ZipperTest extends TestCase {
         Zipper zipper = new Zipper();
         String filters = "!**/*.txt";
         try {
-            byte[] zip = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters);
+            byte[] zip = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters,0);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -69,7 +69,7 @@ public class ZipperTest extends TestCase {
         Zipper zipper = new Zipper();
         String filters = "a/*.txt";
         try {
-            byte[] zip = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters);
+            byte[] zip = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters,0);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -82,10 +82,10 @@ public class ZipperTest extends TestCase {
         Zipper zipper = new Zipper();
         String filters = "!f1.txt";
         try {
-            byte[] zip = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters);
-            File outFile = new File("testOutput.zip");
-            System.out.println("Output file: " + outFile.getAbsolutePath());
-            FileOutputStream out = new FileOutputStream("work/testOutput.zip");
+            byte[] zip = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters,0);
+            FileOutputStream out = new FileOutputStream("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/zipper/target/work/testOutput.zip");
+            //System.out.println("Output file: " + out.getFD().);
+
             out.write(zip);
             out.close();
 
