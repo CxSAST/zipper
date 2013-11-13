@@ -1,15 +1,20 @@
 package com.checkmarx.components.zipper;
 
 /**
- * Created with IntelliJ IDEA.
- * User: denis
- * Date: 13/11/2013
- * Time: 13:15
- * Description:
+ * Receives notifications of the zipping progress. Each time a new file begins
+ * being compressed the listener is notified.
+ *
+ * @author Denis Krivitski
  */
+
 public interface ZipListener {
 
+    /**
+     * Zip progress notification.
+     *
+     * @param currentFileName Name of the file that starts being compressed
+     * @param currentCompressedSize Size of compressed data currently in the output stream
+     */
     void updateProgress(String currentFileName,long currentCompressedSize);
-    void sizeLimitReached(long currentCompressedSize, long maxZipSize);
 
 }

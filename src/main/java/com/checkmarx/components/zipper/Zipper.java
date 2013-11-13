@@ -114,10 +114,14 @@ public class Zipper {
      * @param filterPatterns Filter wildcard patterns
      * @param outputStream Compressed file content is written to this stream
      * @param maxZipSize Limits the number of bytes that will be written to the output stream.
-     *                   Zero value means no limit.
+     *                   Zero value means no limit. When the limit is reached, MaxZipSizeReached exception
+     *                   is thrown.
      *                   NOTE: This limit is checked on file boundaries. Once the limit is reached
      *                   no more files will be written to the output stream. Therefore, the maxZipSize limit
      *                   may be beached by the compressed size of the last file.
+     * @param listener A listener that is notified of the compression progress. Notification is sent
+     *                 each time a new file begins compression.
+     * @throws Zipper.MaxZipSizeReached If maxZipSize limit is reached
      * @throws IOException
      */
 
@@ -126,11 +130,7 @@ public class Zipper {
         DirectoryScanner ds = createDirectoryScanner(baseDir,filterPatterns);
         ds.scan();
         printDebug(ds);
-
-
         zipFile(baseDir,ds.getIncludedFiles(),outputStream,maxZipSize,listener);
-
-
         return;
     }
 
@@ -140,11 +140,14 @@ public class Zipper {
      * @param baseDir Contents of this directory will he filtered and zipped
      * @param filterPatterns Filter wildcard patterns
      * @param maxZipSize Limits the number of bytes that will be written to the output stream.
-     *                   Zero value means no limit.
+     *                   Zero value means no limit. When the limit is reached, MaxZipSizeReached exception
+     *                   is thrown.
      *                   NOTE: This limit is checked on file boundaries. Once the limit is reached
      *                   no more files will be written to the output stream. Therefore, the maxZipSize limit
      *                   may be beached by the compressed size of the last file.
-     * @return Byte array with compressed contents of the filtered base directory.
+     * @param listener A listener that is notified of the compression progress. Notification is sent
+     *                 each time a new file begins compression.
+     * @throws Zipper.MaxZipSizeReached If maxZipSize limit is reached
      * @throws IOException
      */
 
@@ -167,12 +170,9 @@ public class Zipper {
 
             if (maxZipSize > 0 && compressedSize + (file.length()/AVERAGE_ZIP_COMPRESSION_RATIO) > maxZipSize)
             {
-                logger.warn("Maximum zip file size reached. Zip size:" + compressedSize + " Limit:" + maxZipSize);
-                if (listener!=null)
-                {
-                    listener.sizeLimitReached(compressedSize,maxZipSize);
-                }
-                break;
+                logger.info("Maximum zip file size reached. Zip size: " + compressedSize + " bytes Limit: " + maxZipSize + " bytes");
+                zipOutputStream.close();
+                throw new MaxZipSizeReached(compressedSize,maxZipSize);
             }
 
             if (listener!=null)
@@ -265,5 +265,27 @@ public class Zipper {
         {
             logger.debug("Not followed symbolic link: " + file);
         }
-     }
+    }
+
+    /**
+     * Thrown when the number of bytes in output stream reaches maxZipSize limit
+     */
+    public static class MaxZipSizeReached extends IOException
+    {
+        private long compressedSize;
+        private long maxZipSize;
+
+        public MaxZipSizeReached(long compressedSize, long maxZipSize)
+        {
+            super("Zip compressed size reached a limit of " + maxZipSize + " bytes");
+        }
+
+        public long getCompressedSize() {
+            return compressedSize;
+        }
+
+        public long getMaxZipSize() {
+            return maxZipSize;
+        }
+    }
 }
