@@ -28,9 +28,9 @@ import java.util.zip.ZipOutputStream;
  * and directories. Each file/directory is matched against a set of selectors,
  * including special support for matching against filenames with include and
  * and exclude patterns. Only files/directories which match at least one
- * pattern of the include pattern list or other file selector, and don't match
- * any pattern of the exclude pattern list or fail to match against a required
- * selector will be placed in the list of files/directories found.
+ * pattern of the include pattern list, and don't match
+ * any pattern of the exclude pattern list
+ * will be placed in the list of files/directories found.
  * <p>
  * When no list of include patterns is supplied, "**" will be used, which
  * means that everything will be matched. When no list of exclude patterns is
@@ -133,6 +133,7 @@ public class Zipper {
         assert outputStream !=null : "outputStream must not be null";
 
         DirectoryScanner ds = createDirectoryScanner(baseDir,filterPatterns);
+        ds.setFollowSymlinks(true);
         ds.scan();
         printDebug(ds);
         if (ds.getIncludedFiles().length == 0)
@@ -180,6 +181,11 @@ public class Zipper {
             logger.debug("Adding file to zip: " + fileName);
 
             File file = new File(baseDir,fileName);
+            if (!file.canRead())
+            {
+                logger.warn("Skipping unreadable file: " + file);
+                continue;
+            }
 
             if (maxZipSize > 0 && compressedSize + (file.length()/AVERAGE_ZIP_COMPRESSION_RATIO) > maxZipSize)
             {

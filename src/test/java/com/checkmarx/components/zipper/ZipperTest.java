@@ -101,7 +101,7 @@ public class ZipperTest extends TestCase {
         assertTrue(true);
     }
 
-    public void testErrors1() {
+    public void OfftestErrors1() {
 
 
         Zipper zipper = new Zipper();
@@ -124,6 +124,17 @@ public class ZipperTest extends TestCase {
 
 
         assertTrue(true);
+    }
+
+    public void testBrokenLink() {
+        Zipper zipper = new Zipper();
+        File baseDir = new File("/Users/denis/Documents/iOSDevMac/Checkmarx/IntelliJ PlugIn/Scanee Project 2/src");
+        try {
+            byte[] out = zipper.zip(baseDir,"",-1,null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
 
