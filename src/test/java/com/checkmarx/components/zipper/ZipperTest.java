@@ -101,6 +101,33 @@ public class ZipperTest extends TestCase {
         assertTrue(true);
     }
 
+    public void testZip2() {
+
+
+        Zipper zipper = new Zipper();
+        String filters = "!**/*.mov";
+
+        ZipListener zipListener = new ZipListener() {
+            public void updateProgress(String currentFileName, long currentCompressedSize) {
+                System.out.println("ZipListener.updateProgress: " + currentFileName + " size: " + currentCompressedSize);
+            }
+        };
+
+        try {
+            byte[] outArray = zipper.zip(new File("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/temp/basedir"),filters,0,zipListener);
+
+            FileOutputStream out = new FileOutputStream("/Users/denis/Documents/iOSDevMac/Checkmarx/Zipper/zipper/target/work/testOutput2.zip");
+            out.write(outArray);
+            out.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        assertTrue(true);
+    }
+
     public void OfftestErrors1() {
 
 
