@@ -42,6 +42,7 @@
         </dependency>
     </dependencies>
 
+
     <build>
         <plugins>
             <plugin>
@@ -58,4 +59,13 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>checkmarx</id>
+            <url>file:///Volumes/RD/Application/Projects/Maven/</url>
+            <layout>default</layout>
+        </repository>
+    </distributionManagement>
 </project>
