@@ -258,6 +258,67 @@ public class Zipper {
         return ds;
     }
 
+    private DirectoryScanner createDirectoryScanner(File baseDir, String filterExcludePatterns, String filterIncludePatterns)
+    {
+        DirectoryScanner ds = new DirectoryScanner();
+        ds.setBasedir(baseDir);
+        ds.setCaseSensitive(false);
+        ds.setFollowSymlinks(false);
+        ds.setErrorOnMissingDir(false);
+
+
+        LinkedList<String> includePatterns = new LinkedList<String>();
+        LinkedList<String> excludePatterns = new LinkedList<String>();
+
+
+        // Parse filter patterns
+        String[] includePatternsArr;
+        if (filterIncludePatterns!=null)
+        {
+            includePatternsArr = StringUtils.split(filterIncludePatterns,",\n");
+        } else {
+            includePatternsArr = new String[]{};
+        }
+
+        for(String pattern : includePatternsArr)
+        {
+            pattern = pattern.trim();
+            if (pattern.length()>0)
+            {
+                includePatterns.add(pattern);
+                logger.debug("Include pattern detected: >" + pattern + "<");
+            }
+        }
+
+        String[] excludePatternsArr;
+        if (filterExcludePatterns!=null)
+        {
+            excludePatternsArr = StringUtils.split(filterExcludePatterns,",\n");
+        } else {
+            excludePatternsArr = new String[]{};
+        }
+
+        for(String pattern : excludePatternsArr)
+        {
+            pattern = pattern.trim();
+            if (pattern.length()>0)
+            {
+                excludePatterns.add(pattern);
+                logger.debug("Exclude pattern detected: >" + pattern + "<");
+            }
+        }
+
+        if (includePatterns.size()>0)
+        {
+            ds.setIncludes(includePatterns.toArray(new String[]{}));
+        }
+        if (excludePatterns.size()>0)
+        {
+            ds.setExcludes(excludePatterns.toArray(new String[]{}));
+        }
+        return ds;
+    }
+
 
     private void printDebug(DirectoryScanner ds)
     {
