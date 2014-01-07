@@ -143,6 +143,47 @@ public class Zipper {
     }
 
     /**
+     * Scans the base directory, filters the files, and writes the compressed file content to
+     * the provided output stream.
+     *
+     * @param baseDir Contents of this directory will he filtered and zipped
+     * @param filterExcludePatterns Array of filter wildcard exclude patterns
+     * @param filterIncludePatterns Array of filter wildcard include patterns
+     * @param outputStream Compressed file content is written to this stream
+     * @param maxZipSize Limits the number of bytes that will be written to the output stream.
+     *                   Zero value means no limit. When the limit is reached, MaxZipSizeReached exception
+     *                   is thrown.
+     *                   NOTE: This limit is checked on file boundaries. Once the limit is reached
+     *                   no more files will be written to the output stream. Therefore, the maxZipSize limit
+     *                   may be beached by the compressed size of the last file.
+     * @param listener A listener that is notified of the compression progress. Notification is sent
+     *                 each time a new file begins compression.
+     * @throws Zipper.MaxZipSizeReached If maxZipSize limit is reached
+     * @throws NoFilesToZip If there are no files to zip. Either the base directory is empty or does not exists, or all
+     *                      the files are filtered out by the filter.
+     * @throws IOException
+     */
+
+    public void zip(File baseDir, String[] filterExcludePatterns, String[] filterIncludePatterns, OutputStream outputStream, long maxZipSize, ZipListener listener) throws IOException
+    {
+        assert baseDir!=null : "baseDir must not be null";
+        assert outputStream !=null : "outputStream must not be null";
+
+        DirectoryScanner ds = createDirectoryScanner(baseDir, filterExcludePatterns, filterIncludePatterns);
+        ds.setFollowSymlinks(true);
+        ds.scan();
+        printDebug(ds);
+        if (ds.getIncludedFiles().length == 0)
+        {
+            outputStream.close();
+            logger.info("No files to zip");
+            throw new NoFilesToZip();
+        }
+        zipFile(baseDir,ds.getIncludedFiles(),outputStream,maxZipSize,listener);
+        return;
+    }
+
+    /**
      * Scans the base directory, filters the files, and returns the compressed contents as a byte array.
      *
      * @param baseDir Contents of this directory will he filtered and zipped
@@ -164,6 +205,32 @@ public class Zipper {
     public byte[] zip(File baseDir, String filterPatterns, long maxZipSize, ZipListener listener) throws IOException {
         ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
         zip(baseDir,filterPatterns,byteOutputStream,maxZipSize,listener);
+        return byteOutputStream.toByteArray();
+    }
+
+    /**
+     * Scans the base directory, filters the files, and returns the compressed contents as a byte array.
+     *
+     * @param baseDir Contents of this directory will he filtered and zipped
+     * @param filterExcludePatterns Array of filter wildcard exclude patterns
+     * @param filterIncludePatterns Array of filter wildcard include patterns
+     * @param maxZipSize Limits the number of bytes that will be written to the output stream.
+     *                   Zero value means no limit. When the limit is reached, MaxZipSizeReached exception
+     *                   is thrown.
+     *                   NOTE: This limit is checked on file boundaries. Once the limit is reached
+     *                   no more files will be written to the output stream. Therefore, the maxZipSize limit
+     *                   may be beached by the compressed size of the last file.
+     * @param listener A listener that is notified of the compression progress. Notification is sent
+     *                 each time a new file begins compression.
+     * @throws Zipper.MaxZipSizeReached If maxZipSize limit is reached
+     * @throws NoFilesToZip If there are no files to zip. Either the base directory is empty or does not exists, or all
+     *                      the files are filtered out by the filter.
+     * @throws IOException
+     */
+
+    public byte[] zip(File baseDir, String[] filterExcludePatterns, String[] filterIncludePatterns, long maxZipSize, ZipListener listener) throws IOException {
+        ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+        zip(baseDir, filterExcludePatterns, filterIncludePatterns, byteOutputStream,maxZipSize,listener);
         return byteOutputStream.toByteArray();
     }
 
@@ -210,16 +277,8 @@ public class Zipper {
 
     private DirectoryScanner createDirectoryScanner(File baseDir, String filterPatterns)
     {
-        DirectoryScanner ds = new DirectoryScanner();
-        ds.setBasedir(baseDir);
-        ds.setCaseSensitive(false);
-        ds.setFollowSymlinks(false);
-        ds.setErrorOnMissingDir(false);
-
-
         LinkedList<String> includePatterns = new LinkedList<String>();
         LinkedList<String> excludePatterns = new LinkedList<String>();
-
 
         // Parse filter patterns
         String[] patterns;
@@ -247,18 +306,11 @@ public class Zipper {
             }
         }
 
-        if (includePatterns.size()>0)
-        {
-            ds.setIncludes(includePatterns.toArray(new String[]{}));
-        }
-        if (excludePatterns.size()>0)
-        {
-            ds.setExcludes(excludePatterns.toArray(new String[]{}));
-        }
-        return ds;
+        return createDirectoryScanner(baseDir,excludePatterns.toArray(new String[]{}),includePatterns.toArray(new String[]{}) );
     }
 
-    private DirectoryScanner createDirectoryScanner(File baseDir, String filterExcludePatterns, String filterIncludePatterns)
+
+    private DirectoryScanner createDirectoryScanner(File baseDir, String[] filterExcludePatterns, String[] filterIncludePatterns)
     {
         DirectoryScanner ds = new DirectoryScanner();
         ds.setBasedir(baseDir);
@@ -266,55 +318,13 @@ public class Zipper {
         ds.setFollowSymlinks(false);
         ds.setErrorOnMissingDir(false);
 
-
-        LinkedList<String> includePatterns = new LinkedList<String>();
-        LinkedList<String> excludePatterns = new LinkedList<String>();
-
-
-        // Parse filter patterns
-        String[] includePatternsArr;
-        if (filterIncludePatterns!=null)
+        if (filterIncludePatterns != null && filterIncludePatterns.length>0)
         {
-            includePatternsArr = StringUtils.split(filterIncludePatterns,",\n");
-        } else {
-            includePatternsArr = new String[]{};
+            ds.setIncludes(filterIncludePatterns);
         }
-
-        for(String pattern : includePatternsArr)
+        if (filterExcludePatterns != null && filterExcludePatterns.length >0)
         {
-            pattern = pattern.trim();
-            if (pattern.length()>0)
-            {
-                includePatterns.add(pattern);
-                logger.debug("Include pattern detected: >" + pattern + "<");
-            }
-        }
-
-        String[] excludePatternsArr;
-        if (filterExcludePatterns!=null)
-        {
-            excludePatternsArr = StringUtils.split(filterExcludePatterns,",\n");
-        } else {
-            excludePatternsArr = new String[]{};
-        }
-
-        for(String pattern : excludePatternsArr)
-        {
-            pattern = pattern.trim();
-            if (pattern.length()>0)
-            {
-                excludePatterns.add(pattern);
-                logger.debug("Exclude pattern detected: >" + pattern + "<");
-            }
-        }
-
-        if (includePatterns.size()>0)
-        {
-            ds.setIncludes(includePatterns.toArray(new String[]{}));
-        }
-        if (excludePatterns.size()>0)
-        {
-            ds.setExcludes(excludePatterns.toArray(new String[]{}));
+            ds.setExcludes(filterExcludePatterns);
         }
         return ds;
     }
