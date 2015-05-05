@@ -1,12 +1,7 @@
-plugins {
-    id "com.jfrog.artifactory" version "3.1.0"
-}
-
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'maven'
-apply plugin: 'maven-publish'
 apply plugin: 'project-report'
 
 
@@ -47,34 +42,4 @@ dependencies {
 		'org.apache.commons:commons-lang3:3.1',
 		'commons-io:commons-io:2.4'
     testCompile 'junit:junit:3.8.1'
-}
-
-artifactory {
-    contextUrl = "${project.mavenRepo}" // base artifactory url
-  publish {
-    repository {
-      repoKey = 'libs-releases'   //The Artifactory repository key to publish to
-      username = 'username'      //The publisher user name
-      password = 'password'       //The publisher password
-      maven = true
-    }
-  }
-}
-
-artifactoryPublish { 
-  dependsOn jar
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
-
-	repositories {
-		maven {
-			url "${project.mavenRepo}/libs-release-local"
-		}
-	}
 }
