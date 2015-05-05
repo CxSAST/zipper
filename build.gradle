@@ -19,17 +19,23 @@ description = "Zipper"
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
+if (project.hasProperty('buildNumber')) {
+	project.version=project.version + "-" + buildNumber
+} else {
+	project.version=project.version + "-" +"SNAPSHOT"
+}
+
 jar {
 	manifest {
 		attributes	'Implementation-Title': project.description,
-					'Implementation-Version': project.version
+					'Implementation-Version': project.version,
+					'Repository-Version': repositoryVersion				
 	}
 }
 
 project.ext {
   mavenRepo = "http://10.31.1.81:8081/artifactory"
 }
-
 
 repositories {       
      maven { url "${project.mavenRepo}/libs-release" } 

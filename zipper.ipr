@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactManager">
+    <artifact type="jar" name="zipper:jar">
+      <output-path>$PROJECT_DIR$/out/artifacts/zipper_jar</output-path>
+      <root id="archive" name="zipper.jar">
+        <element id="module-output" name="zipper" />
+        <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/ant/ant/1.9.2/ant-1.9.2.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-io/commons-io/2.4/commons-io-2.4.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.ant/ant/1.9.2/112cf195dec0bd2b7967b5711b88c880b6640d86/ant-1.9.2.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.1/905075e6c80f206bbe6cf1e809d2caa69f420c76/commons-lang3-3.1.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.ant/ant-launcher/1.9.2/4f20f0651dd207caf04351192d59936e71da895b/ant-launcher-1.9.2.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/log4j/log4j/1.2.17/5af35056b4d257e4b64b9e8069c0746e8b08629f/log4j-1.2.17.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/commons/commons-lang3/3.1/commons-lang3-3.1.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-io/commons-io/2.4/b1b6ea3b7e4aa4f492509a4952029cd8e48019ad/commons-io-2.4.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/ant/ant-launcher/1.9.2/ant-launcher-1.9.2.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$MAVEN_REPOSITORY$/log4j/log4j/1.2.17/log4j-1.2.17.jar" path-in-jar="/" />
+      </root>
+    </artifact>
+  </component>
   <component name="CodeStyleManager">
     <option name="USE_DEFAULT_CODE_STYLE_SCHEME" value="true" />
     <option name="CODE_STYLE_SCHEME" value="" />
@@ -9,6 +27,7 @@
     <resourceExtensions />
     <wildcardResourcePatterns>
       <entry name="!?*.java" />
+      <entry name="!?*.groovy" />
     </wildcardResourcePatterns>
     <annotationProcessing>
       <profile default="true" name="Default" enabled="false">
@@ -22,10 +41,11 @@
         <module name="zipper" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="zipper" target="1.5" />
+    </bytecodeTargetLevel>
   </component>
-  <component name="CopyrightManager" default="">
-    <module2copyright />
-  </component>
+  <component name="CopyrightManager" default="" />
   <component name="DependencyValidationManager">
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
@@ -211,7 +231,7 @@
       <module fileurl="file://$PROJECT_DIR$/zipper.iml" filepath="$PROJECT_DIR$/zipper.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" />
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="" />
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
@@ -285,4 +305,3 @@
     </library>
   </component>
 </project>
-
