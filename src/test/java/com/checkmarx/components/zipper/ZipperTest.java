@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.notification.RunListener.ThreadSafe;
 
@@ -80,7 +79,6 @@ public class ZipperTest {
 	}
 
 	@Test
-	@Ignore
 	public void testZip2() throws IOException {
 
 		Zipper zipper = new Zipper();

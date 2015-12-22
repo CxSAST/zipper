@@ -3,3 +3,5 @@ target
 .gradle/
 build/
 /bin/
+out/
+.settings/
