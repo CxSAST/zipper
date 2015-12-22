@@ -23,23 +23,35 @@ if (project.hasProperty('buildNumber')) {
 jar {
 	manifest {
 		attributes	'Implementation-Title': project.description,
-					'Implementation-Version': project.version,
-					'Repository-Version': repositoryVersion				
+		'Implementation-Version': project.version,
+		'Repository-Version': repositoryVersion
 	}
 }
 
-project.ext {
-  mavenRepo = "http://10.31.1.81:8081/artifactory"
+test {
+	maxParallelForks = Runtime.getRuntime().availableProcessors()
 }
 
-repositories {       
-     maven { url "${project.mavenRepo}/libs-release" } 
+task writePom << {
+	pom {
+		project {
+			licenses {
+				license {
+					name 'MIT license'
+					url 'http://opensource.org/licenses/MIT'
+					distribution 'repo'
+				}
+			}
+		}
+	}.writeTo("$buildDir/pom.xml")
 }
+
+repositories { jcenter() }
 
 dependencies {
-    compile 'org.apache.ant:ant:1.9.2',
-		'log4j:log4j:1.2.17',
-		'org.apache.commons:commons-lang3:3.1',
-		'commons-io:commons-io:2.4'
-    testCompile 'junit:junit:3.8.1'
+	compile 'org.apache.ant:ant:1.9.2',
+			'log4j:log4j:1.2.17',
+			'org.apache.commons:commons-lang3:3.1',
+			'commons-io:commons-io:2.4'
+	testCompile 'junit:junit:4.12'
 }
