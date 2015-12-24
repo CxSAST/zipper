@@ -3,8 +3,8 @@ plugins { id "com.jfrog.bintray" version "1.5" }
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-apply plugin: 'maven'
 apply plugin: 'project-report'
+apply plugin: 'maven-publish'
 
 group = 'com.checkmarx.components'
 version = '1.2.1'
@@ -26,20 +26,6 @@ test {
 	maxParallelForks = Runtime.getRuntime().availableProcessors()
 }
 
-task writePom << {
-	pom {
-		project {
-			licenses {
-				license {
-					name 'MIT license'
-					url 'http://opensource.org/licenses/MIT'
-					distribution 'repo'
-				}
-			}
-		}
-	}.writeTo(jar.archivePath.path.replace('jar','xml'))
-}
-
 repositories { jcenter() }
 
 dependencies {
@@ -51,10 +37,48 @@ dependencies {
 	testCompile 'junit:junit:4.12'
 }
 
+task sourceJar(type: Jar) {
+	from sourceSets.main.allJava
+	classifier "sources"
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+
+			from components.java
+
+			artifact sourceJar
+		}
+	}
+}
+
+publishing.publications.all {
+	pom.withXml {
+		asNode().children().last() + {
+			licenses {
+				license {
+					name 'MIT license'
+					url 'http://opensource.org/licenses/MIT'
+					distribution 'repo'
+				}
+			}
+		}
+		// Workaround for the issue described here: https://discuss.gradle.org/t/maven-publish-plugin-generated-pom-making-dependency-scope-runtime/7494
+		asNode().dependencies.'*'.findAll() {
+			it.scope.text() == 'runtime' && project.configurations.compile.allDependencies.find { dep ->
+				dep.name == it.artifactId.text()
+			}
+		}.each() {
+			it.scope*.value = 'compile'
+		}
+	}
+}
+
 bintray {
 	user = System.getenv('BINTRAY_USER')
 	key = System.getenv('BINTRAY_KEY')
-	configurations = ['archives']
+	publications = ['mavenJava']
 	pkg {
 		repo = 'maven'
 		name = 'com.checkmarx.components'
