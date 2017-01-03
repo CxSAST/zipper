@@ -1,18 +1,14 @@
 package com.checkmarx.components.zipper;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.LinkedList;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipOutputStream;
+
+import java.io.*;
+import java.util.LinkedList;
 
 /**
  * File zipper with filter.
@@ -296,7 +292,7 @@ public class Zipper {
 				LOGGER.info("Maximum zip file size reached. Zip size: " + compressedSize + " bytes Limit: " + maxZipSize
 						+ " bytes");
 				zipOutputStream.close();
-				throw new MaxZipSizeReached(compressedSize, maxZipSize);
+				throw new MaxZipSizeReached(fileName, compressedSize, maxZipSize);
 			}
 
 			if (listener != null) {
@@ -392,12 +388,24 @@ public class Zipper {
 	 * Thrown when the number of bytes in output stream reaches maxZipSize limit
 	 */
 	public static class MaxZipSizeReached extends IOException {
+		private String fileName;
 		private long compressedSize;
 		private long maxZipSize;
 
+		public MaxZipSizeReached(String fileName, long compressedSize, long maxZipSize) {
+			this.fileName = fileName;
+			this.compressedSize = compressedSize;
+			this.maxZipSize = maxZipSize;
+			super("When trying to zip file "+ fileName +", zip compressed size reached a limit of " + maxZipSize + " bytes");
+		}
+
 		public MaxZipSizeReached(long compressedSize, long maxZipSize) {
+			this.compressedSize = compressedSize;
+			this.maxZipSize = maxZipSize;
 			super("Zip compressed size reached a limit of " + maxZipSize + " bytes");
 		}
+
+		public String getFileName() {return fileName; }
 
 		public long getCompressedSize() {
 			return compressedSize;
