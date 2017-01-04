@@ -7,7 +7,6 @@ import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipOutputStream;
 
-import java.io.*;
 import java.util.LinkedList;
 
 /**
@@ -388,15 +387,15 @@ public class Zipper {
 	 * Thrown when the number of bytes in output stream reaches maxZipSize limit
 	 */
 	public static class MaxZipSizeReached extends IOException {
-		private String fileName;
+		private String currentZippedFileName;
 		private long compressedSize;
 		private long maxZipSize;
 
-		public MaxZipSizeReached(String fileName, long compressedSize, long maxZipSize) {
-			this.fileName = fileName;
+		public MaxZipSizeReached(String currentZippedFileName, long compressedSize, long maxZipSize) {
+			this.currentZippedFileName = currentZippedFileName;
 			this.compressedSize = compressedSize;
 			this.maxZipSize = maxZipSize;
-			super("When trying to zip file "+ fileName +", zip compressed size reached a limit of " + maxZipSize + " bytes");
+			super("Zip compressed size reached a limit of " + maxZipSize + " bytes");
 		}
 
 		public MaxZipSizeReached(long compressedSize, long maxZipSize) {
@@ -405,7 +404,7 @@ public class Zipper {
 			super("Zip compressed size reached a limit of " + maxZipSize + " bytes");
 		}
 
-		public String getFileName() {return fileName; }
+		public String getCurrentZippedFileName() {return currentZippedFileName; }
 
 		public long getCompressedSize() {
 			return compressedSize;
