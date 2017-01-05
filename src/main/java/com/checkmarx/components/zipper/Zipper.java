@@ -1,12 +1,17 @@
 package com.checkmarx.components.zipper;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipOutputStream;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.LinkedList;
 
 /**
@@ -392,16 +397,16 @@ public class Zipper {
 		private long maxZipSize;
 
 		public MaxZipSizeReached(String currentZippedFileName, long compressedSize, long maxZipSize) {
+			super("Zip compressed size reached a limit of " + maxZipSize + " bytes");
 			this.currentZippedFileName = currentZippedFileName;
 			this.compressedSize = compressedSize;
 			this.maxZipSize = maxZipSize;
-			super("Zip compressed size reached a limit of " + maxZipSize + " bytes");
 		}
 
 		public MaxZipSizeReached(long compressedSize, long maxZipSize) {
+			super("Zip compressed size reached a limit of " + maxZipSize + " bytes");
 			this.compressedSize = compressedSize;
 			this.maxZipSize = maxZipSize;
-			super("Zip compressed size reached a limit of " + maxZipSize + " bytes");
 		}
 
 		public String getCurrentZippedFileName() {return currentZippedFileName; }
