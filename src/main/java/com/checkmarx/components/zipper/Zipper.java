@@ -264,7 +264,6 @@ public class Zipper {
 	 *             empty or does not exists, or all the files are filtered out
 	 *             by the filter.
 	 * @throws IOException
-	 *
 	 */
 
 	public byte[] zip(File baseDir, String[] filterExcludePatterns, String[] filterIncludePatterns, long maxZipSize,
